@@ -18,19 +18,19 @@ data "aws_vpc" "default"{
   default = true
 }
 
-resource "aws_instance" "web" {
+resource "aws_instance" "blog" {
   ami           = data.aws_ami.app_ami.id
   instance_type = "t3.nano"
 
- vpc_security_group_ids = [aws_security_group.security_group_id]
+ vpc_security_group_ids = [aws_security_group.blog.id]
 
   tags = {
     Name = "Learning Terraform"
   }
 }
 
-resource "aws_security_group" "security_group"{
-  name        = "security_group"
+resource "aws_security_group" "blog"{
+  name        = "blog"
   description = "Allow HTTP and HTTPS in. Allow everything out"
   vpc_id      =  data.aws_vpc.default.id
 }

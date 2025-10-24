@@ -56,10 +56,12 @@ module "alb" {
   security_groups = [module.module_security_group.security_group_id]
 
 
-  http_tcp_listeners = {
+  listeners = {
+    http_tcp_listeners = {
       port               = 80
       protocol           = "HTTP"
       target_group_index = 0
+    }
   }
   
 

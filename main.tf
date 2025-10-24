@@ -56,7 +56,7 @@ module "alb" {
   security_groups = [module.module_security_group.security_group_id]
 
 
-  http-tcp-listeners = [
+  http_tcp_listeners = [
     {
       port               = 80
       protocol           = "HTTP"

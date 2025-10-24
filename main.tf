@@ -55,6 +55,31 @@ module "alb" {
   subnets         = module.module_dev_vpc.public_subnets
   security_groups = [module.module_security_group.security_group_id]
 
+  # Security Group
+  enforce_security_group_inbound_rules_on_private_link_traffic = "on"
+  security_group_ingress_rules = {
+    all_http = {
+      from_port   = 80
+      to_port     = 82
+      ip_protocol = "tcp"
+      description = "HTTP web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+    all_https = {
+      from_port   = 443
+      to_port     = 445
+      ip_protocol = "tcp"
+      description = "HTTPS web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+  }
+  security_group_egress_rules = {
+    all = {
+      ip_protocol = "-1"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+  }
+
 
   listeners = {
     http_tcp_listeners = {

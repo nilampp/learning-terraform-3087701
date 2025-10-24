@@ -47,11 +47,12 @@ resource "aws_instance" "web" {
 }
 
 module "alb" {
-  source = "terraform-aws-modules/alb/aws"
+  source            = "terraform-aws-modules/alb/aws"
+  load_balance_type ="application"
 
-  name           = "dev-alb"
-  vpc_id         = module.module_dev_vpc.vpc_id
-  subnets        = module.module_dev_vpc.public_subnets
+  name            = "dev-alb"
+  vpc_id          = module.module_dev_vpc.vpc_id
+  subnets         = module.module_dev_vpc.public_subnets
   security_groups = [module.module_security_group.security_group_id]
 
   listeners = {
@@ -62,15 +63,20 @@ module "alb" {
     }
   }
 
-  target_groups = {
-    ex-instance = {
+  target_groups = [
+    {
       name_prefix      = "blog"
       protocol         = "HTTP"
       port             = 80
       target_type      = "instance"
-      target_id        = aws_instance.web.id
+      targets ={
+        my_target ={
+          target_id        = aws_instance.web.id
+          port             = 80
+        }
+      } 
     }
-  }
+  ] 
 
   tags = {
     Environment = "dev"

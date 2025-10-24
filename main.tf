@@ -33,20 +33,23 @@ module "module_dev_vpc" {
   }
 }
 
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.app_ami.id
+module "autoscaling" {
+  source  = "terraform-aws-modules/autoscaling/aws"
+  version = "9.0.2"
+  name    = "autoscaling"
+
+  min_size = 1
+  max_size = 2
+
+  vpc_zone_identifier  = module.dev_vpc.public_subnets
+  target_group_arns    = module.dev_alb.target_group_arns
+  security_groups = [module.module_security_group.security_group_id]
+  
+  image_id      = data.aws_ami.app_ami.id
   instance_type = var.instance_type
-
- vpc_security_group_ids = [module.module_security_group.security_group_id]
-
- subnet_id = module.module_dev_vpc.public_subnets[0]
-
-  tags = {
-    Name = "Learning Terraform"
-  }
 }
 
-module "alb" {
+module "dev_alb" {
   source            = "terraform-aws-modules/alb/aws"
   load_balancer_type ="application"
 
@@ -55,6 +58,30 @@ module "alb" {
   subnets         = module.module_dev_vpc.public_subnets
   security_groups = [module.module_security_group.security_group_id]
 
+ resource "aws_lb_listener_rule" "health_check" {
+  listener_arn = aws_lb_listener.front_end.arn
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "HEALTHY"
+      status_code  = "200"
+    }
+  }
+
+  condition {
+    query_string {
+      key   = "health"
+      value = "check"
+    }
+
+    query_string {
+      value = "bar"
+    }
+  }
+}
   listeners = {
     http_tcp_listeners = {
       port               = 80

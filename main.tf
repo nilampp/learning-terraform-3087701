@@ -55,28 +55,22 @@ module "alb" {
   subnets         = module.module_dev_vpc.public_subnets
   security_groups = [module.module_security_group.security_group_id]
 
-  listeners = {
-    http-tcs-listeners = {
-      port               = 80
-      protocol           = "HTTP"
-      target_group_index = 0
-    }
+
+  http-tcp-listeners = {
+    port               = 80
+    protocol           = "HTTP"
+    target_group_index = 0
   }
 
-  target_groups = [
-    {
+  target_groups = {
+    ex-instance = {
       name_prefix      = "blog"
       protocol         = "HTTP"
       port             = 80
       target_type      = "instance"
-      targets ={
-        my_target ={
-          target_id        = aws_instance.web.id
-          port             = 80
-        }
-      } 
+      target_id        = aws_instance.web.id
     }
-  ] 
+  }
 
   tags = {
     Environment = "dev"

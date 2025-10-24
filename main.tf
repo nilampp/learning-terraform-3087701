@@ -42,29 +42,3 @@ module "module_security_group"{
   egress_rules       = ["all-all"]
   egress_cidr_blocks = ["0.0.0.0/0"]
 }
-
-resource "aws_security_group" "security_group"{
-  name        = "security_group"
-  description = "Allow HTTP and HTTPS in. Allow everything out"
-  vpc_id      =  data.aws_vpc.default.id
-}
-
-resource "aws_security_group_rule" "rule_http_in"{
-  type        = "ingress"
-  from_port   = 443 
-  to_port     = 443
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-
-  security_group_id = aws_security_group.security_group.id
-}
-
-resource "aws_security_group_rule" "rule_http_everything_out"{
-  type        = "egress"
-  from_port   = 0 
-  to_port     = 0
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-
-  security_group_id = aws_security_group.security_group.id
-}

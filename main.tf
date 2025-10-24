@@ -48,7 +48,7 @@ resource "aws_instance" "web" {
 
 module "alb" {
   source            = "terraform-aws-modules/alb/aws"
-  load_balance_type ="application"
+  load_balancer_type ="application"
 
   name            = "dev-alb"
   vpc_id          = module.module_dev_vpc.vpc_id

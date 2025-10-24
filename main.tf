@@ -33,7 +33,6 @@ module "module_dev_vpc" {
   }
 }
 
-
 resource "aws_instance" "web" {
   ami           = data.aws_ami.app_ami.id
   instance_type = var.instance_type
@@ -44,6 +43,37 @@ resource "aws_instance" "web" {
 
   tags = {
     Name = "Learning Terraform"
+  }
+}
+
+module "alb" {
+  source = "terraform-aws-modules/alb/aws"
+
+  name           = "dev-alb"
+  vpc_id         = module.module_dev_vpc.vpc_id
+  subnets        = module.module_dev_vpc.public_subnets
+  security_group = [module_security_group.security_group_id]
+
+  listeners = {
+    http-tcs-listeners = {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+    }
+  }
+
+  target_groups = {
+    ex-instance = {
+      name_prefix      = "blog"
+      protocol         = "HTTP"
+      port             = 80
+      target_type      = "instance"
+      target_id        = aws_instance.web.id
+    }
+  }
+
+  tags = {
+    Environment = "dev"
   }
 }
 

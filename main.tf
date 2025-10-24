@@ -52,7 +52,7 @@ module "alb" {
   name           = "dev-alb"
   vpc_id         = module.module_dev_vpc.vpc_id
   subnets        = module.module_dev_vpc.public_subnets
-  security_groups = [module.security_group.security_group_id]
+  security_groups = [module.module_security_group.security_group_id]
 
   listeners = {
     http-tcs-listeners = {
